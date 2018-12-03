@@ -1,0 +1,42 @@
+1. 
+import sqlalchemy #импорт модуля
+from sqlalchemy import create_engine #ядро SQLAlchemy
+
+engine = create_engine('sqlite:///:memory:', echo=False) # будем использовать только БД SQLite, хранящуюся в памяти.
+                                                        #Чтобы соединиться с СУБД, мы используем функцию create_engine()
+
+from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
+metadata = MetaData()
+users_table = Table('users', metadata, 
+    Column('id', Integer, primary_key=True),
+    Column('name', String),
+    Column('fullname', String),
+    Column('password', String)
+) 
+metadata.create_all(engine)
+class User(object): # 
+    def __init__(self, name, fullname, password): 
+        self.name = name
+        self.fullname = fullname
+        self.password = password
+
+    def __repr__(self):
+        return "<User('%s','%s', '%s')>" % (self.name, self.fullname, self.password) 
+
+from sqlalchemy.orm import mapper 
+mapper(User, users_table)
+#print(mapper(User, users_table)) 
+from sqlalchemy.orm import sessionmaker
+Session = sessionmaker(bind=engine)
+session = Session() #запустили сессию
+session.add_all([User("kolia", "Cool Kolian[S.A.]","kolia$$$"), User("zina", "Zina Korzina", "zk18"),User("masha", "Marya Petrovna", "superboobs")])
+session.commit()
+session.query(User).all()[1].password="1234"
+check=session.dirty
+print(check)
+
+
+2. for instance in session.query(User).order_by(User.id): 
+    print(instance.name, instance.fullname)
+    
+3. session.query(User).filter_by(name='masha').filter(User.fullname=='Marya Petrovna').all()
