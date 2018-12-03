@@ -40,3 +40,4 @@ print(check)
     print(instance.name, instance.fullname)
     
 3. session.query(User).filter_by(name='masha').filter(User.fullname=='Marya Petrovna').all()
+4. session.query(User).filter(User.zp<20000).all()
